@@ -636,6 +636,9 @@ void enumerate_freq(Eqclass *eq, int iter)
          if (output){
             cout << "ITER " << iter-1 << endl;
             cout << *neq;
+	    ofstream structures("structures.out", ios::app);
+	    structures << *neq;
+	    structures.close();
          }
          if (prune_type == prune) FK.add(iter,neq);
          enumerate_freq(neq, iter+1);
@@ -670,11 +673,15 @@ void form_f2_lists(Eqclass *eq)
 
 void get_Fk(list<Eqclass *> &F2list){
    Eqclass *eq;
-
+   
+   ofstream structures("structures.out", ios::app);
    while(!F2list.empty()){
       eq = F2list.front();
       form_f2_lists(eq);
-      if (output) cout << *eq;
+      if (output) {
+          structures << *eq;
+	  cout << *eq;
+      }
       if (prune_type == prune) FK.add(2, eq);
       switch(alg_type){
       case treeminer:
@@ -687,6 +694,7 @@ void get_Fk(list<Eqclass *> &F2list){
       delete eq;
       F2list.pop_front();
    }
+   structures.close();
 }
 
 int main(int argc, char **argv)
@@ -694,7 +702,10 @@ int main(int argc, char **argv)
    TimeTracker tt;
    tt.Start(); 
    parse_args(argc, argv); 
-  
+   
+   ofstream structures("structures.out", std::ofstream::trunc);
+   structures << "";
+   structures.close(); 
    DCB = new Dbase_Ctrl_Blk(infile); 
    get_F1();
    list<Eqclass *> *F2list = get_F2();
